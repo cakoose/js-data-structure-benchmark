@@ -1,0 +1,90 @@
+CPU      4x Intel(R) Core(TM) i5-6267U CPU @ 2.90GHz
+Node     14.15.0
+V8       8.4.371.19-node.17
+OS       darwin, 19.6.0
+NPM 
+    avl 1.4.4
+    functional-red-black-tree 1.0.1
+    immutable 4.0.0-rc.12
+    immutable-sorted 0.2.11
+    redis-sorted-set 2.0.0
+    collections 5.1.12
+    sorted-btree 1.4.0
+    @thi.ng/associative 5.0.8
+
+Reported value is "ns per add+remove operation".
+Reported value is the mean of multiple test samples.
+
+-------------------------------------------------------------
+Remove a key then add a key.
+
+Map size: 10
+      84 ± 3%  JS Map (unsorted baseline)
+     329 ±13%  avl
+     310 ± 3%  goneill-b+tree order=16
+     449 ± 3%  goneill-b+tree order=8
+     617 ± 5%  functional-red-black-tree [persistent]
+    1596 ± 3%  sorted-btree, in-place
+    2075 ± 3%  sorted-btree [persistent]
+    1188 ± 5%  thi.ng/associative SortedMap
+    1764 ± 4%  redis-sorted-set
+    1259 ± 2%  immutable-sorted, in-place
+    1363 ± 4%  immutable-sorted [persistent]
+    3900 ± 2%  collections.js SortedMap
+Map size: 1000
+     130 ± 2%  JS Map (unsorted baseline)
+     942 ± 7%  avl
+    1318 ± 3%  goneill-b+tree order=16
+    1713 ± 4%  goneill-b+tree order=8
+    1739 ± 3%  functional-red-black-tree [persistent]
+    4381 ± 2%  sorted-btree, in-place
+    5629 ± 4%  sorted-btree [persistent]
+    3085 ± 2%  thi.ng/associative SortedMap
+    2480 ± 4%  redis-sorted-set
+    4992 ± 4%  immutable-sorted, in-place
+    5344 ± 3%  immutable-sorted [persistent]
+   10663 ± 3%  collections.js SortedMap
+Map size: 100000
+     574 ±21%  JS Map (unsorted baseline)
+    3452 ± 6%  avl
+    4472 ± 4%  goneill-b+tree order=16
+    5861 ± 3%  goneill-b+tree order=8
+    7108 ±14%  functional-red-black-tree [persistent]
+    9206 ± 3%  sorted-btree, in-place
+   12681 ± 3%  sorted-btree [persistent]
+   13256 ± 6%  thi.ng/associative SortedMap
+   17274 ± 4%  redis-sorted-set
+   16762 ± 3%  immutable-sorted, in-place
+   17199 ±11%  immutable-sorted [persistent]
+   28636 ± 6%  collections.js SortedMap
+
+-------------------------------------------------------------
+Same as above, but batches of size N (for persistent structures)
+
+Map size: 10, N: 2
+     101 ± 7%  JS Map (unsorted baseline)
+     425 ± 3%  immutable-sorted [persistent]
+Map size: 10, N: 10
+      88 ± 3%  JS Map (unsorted baseline)
+     940 ± 4%  immutable-sorted [persistent]
+Map size: 10, N: 50
+      87 ±11%  JS Map (unsorted baseline)
+    1224 ± 4%  immutable-sorted [persistent]
+Map size: 1000, N: 2
+     142 ± 4%  JS Map (unsorted baseline)
+     408 ± 4%  immutable-sorted [persistent]
+Map size: 1000, N: 10
+     140 ± 6%  JS Map (unsorted baseline)
+     902 ± 3%  immutable-sorted [persistent]
+Map size: 1000, N: 50
+     144 ± 7%  JS Map (unsorted baseline)
+    1768 ± 3%  immutable-sorted [persistent]
+Map size: 100000, N: 2
+     529 ± 6%  JS Map (unsorted baseline)
+     344 ± 2%  immutable-sorted [persistent]
+Map size: 100000, N: 10
+     510 ± 4%  JS Map (unsorted baseline)
+     910 ± 2%  immutable-sorted [persistent]
+Map size: 100000, N: 50
+     446 ± 5%  JS Map (unsorted baseline)
+    1655 ± 3%  immutable-sorted [persistent]

@@ -1,0 +1,32 @@
+{
+    "name": "crypto-benchmarks",
+    "version": "0.0.1",
+    "description": "Measures the execution time of some crypto algorithm implementations.",
+    "scripts": {
+        "build": "./node_modules/.bin/tsc",
+        "watch": "./node_modules/.bin/tsc --watch",
+        "bench": "NODE_PATH=vendor node -r source-map-support/register dist/main.js"
+    },
+    "author": "Kannan Goundan <kannan@cakoose.com>",
+    "license": "CC0-1.0",
+    "dependencies": {
+        "@thi.ng/associative": "^5.0.8",
+        "@types/collections": "^5.0.2",
+        "argparse": "2.0.1",
+        "avl": "^1.4.4",
+        "benchmark": "2.1.4",
+        "collections": "^5.1.12",
+        "functional-red-black-tree": "1.0.1",
+        "immutable": "4.0.0-rc.12",
+        "immutable-sorted": "^0.2.11",
+        "redis-sorted-set": "^2.0.0",
+        "sorted-btree": "^1.4.0"
+    },
+    "devDependencies": {
+        "@types/argparse": "2.0.2",
+        "@types/benchmark": "2.1.0",
+        "@types/node": "14.14.6",
+        "source-map-support": "^0.5.19",
+        "typescript": "4.0.5"
+    }
+}
