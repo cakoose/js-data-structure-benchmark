@@ -1,0 +1,29 @@
+{
+    "name": "crypto-benchmarks",
+    "version": "0.0.1",
+    "description": "Measures the execution time of some crypto algorithm implementations.",
+    "scripts": {
+        "build": "./node_modules/.bin/tsc",
+        "bench": "./node_modules/.bin/ts-node main.ts"
+    },
+    "author": "Kannan Goundan <kannan@cakoose.com>",
+    "license": "CC0-1.0",
+    "dependencies": {
+        "immutable": "4.0.0-rc.12",
+        "crio": "5.0.2",
+        "seamless-immutable": "7.1.4",
+        "immer": "3.1.3",
+        "argparse": "1.0.10",
+        "benchmark": "2.1.4",
+        "semver": "5.6.0"
+    },
+    "devDependencies": {
+        "@types/argparse": "1.0.36",
+        "@types/benchmark": "1.0.31",
+        "@types/node": "11.11.6",
+        "@types/semver": "5.5.0",
+        "ts-node": "8.3.0",
+        "tslint": "5.18.0",
+        "typescript": "3.5.2"
+    }
+}

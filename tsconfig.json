@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "lib": ["es6"],
+        "strict": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "allowJs": false,
+        "sourceMap": true,
+        "outDir": "./build"
+    },
+    "include": [
+        "main.ts"
+    ]
+}
