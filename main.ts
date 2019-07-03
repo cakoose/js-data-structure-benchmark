@@ -6,7 +6,9 @@ import * as argparse from 'argparse';
 import * as crypto from 'crypto';
 
 import * as immutableJs from 'immutable';
+import SortedBTree from 'sorted-btree';
 const functionalRedBlackTree = require('functional-red-black-tree');
+const immutableSorted = require('immutable-sorted');
 
 async function mainAsync(progName: string, args: Array<string>) {
     const {filters, test} = parseArgs(progName, args);
@@ -32,7 +34,7 @@ async function mainAsync(progName: string, args: Array<string>) {
     console.log('Map, remove key then add it back');
     console.log();
 
-    for (const mapSize of [10, 100, 1000, 10000]) {
+    for (const mapSize of [10, 1000, 100000]) {
         const suite = createSuite(test, 1, `Map size: ${mapSize}`);
 
         const initialKeys: Array<string> = [];
@@ -42,27 +44,27 @@ async function mainAsync(progName: string, args: Array<string>) {
         }
 
         {
-            const map: {[key: string]: number} = {};
-            for (let key of initialKeys) {
-                map[key] = 1;
+            const map = new Map();
+            for (const key of initialKeys) {
+                map.set(key, 1);
             }
             let keyI = 0;
-            suite.add('JS Object', () => {
+            suite.add('built-in', () => {
                 const key = initialKeys[keyI];
                 keyI = keyI + 1;
                 if (keyI === initialKeys.length) keyI = 0;
-                delete map[key];
-                map[key] = 1;
+                map.delete(key);
+                map.set(key, 1);
             });
         }
 
         {
-            const map = new Map();
-            for (let key of initialKeys) {
+            const map = immutableJs.Map().asMutable();
+            for (const key of initialKeys) {
                 map.set(key, 1);
             }
             let keyI = 0;
-            suite.add('JS Map', () => {
+            suite.add('immutable', () => {
                 const key = initialKeys[keyI];
                 keyI = keyI + 1;
                 if (keyI === initialKeys.length) keyI = 0;
@@ -73,11 +75,13 @@ async function mainAsync(progName: string, args: Array<string>) {
 
         {
             let map = immutableJs.Map();
-            for (let key of initialKeys) {
-                map = map.set(key, 1);
-            }
+            map.withMutations(map => {
+                for (const key of initialKeys) {
+                    map = map.set(key, 1);
+                }
+            });
             let keyI = 0;
-            suite.add('ImmutableJS Map', () => {
+            suite.add('immutable (persistent)', () => {
                 const key = initialKeys[keyI];
                 keyI = keyI + 1;
                 if (keyI === initialKeys.length) keyI = 0;
@@ -88,11 +92,11 @@ async function mainAsync(progName: string, args: Array<string>) {
 
         {
             let map = functionalRedBlackTree();
-            for (let key of initialKeys) {
+            for (const key of initialKeys) {
                 map = map.insert(key, 1);
             }
             let keyI = 0;
-            suite.add('functional-red-black-tree', () => {
+            suite.add('functional-red-black-tree (persistent)', () => {
                 const key = initialKeys[keyI];
                 keyI = keyI + 1;
                 if (keyI === initialKeys.length) keyI = 0;
@@ -101,15 +105,62 @@ async function mainAsync(progName: string, args: Array<string>) {
             });
         }
 
+        {
+            const map = new SortedBTree();
+            for (const key of initialKeys) {
+                map.set(key, 1);
+            }
+            let keyI = 0;
+            suite.add('sorted-btree', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map.delete(key);
+                map.set(key, 1);
+            });
+        }
+
+        {
+            let map = new SortedBTree();
+            for (const key of initialKeys) {
+                map.set(key, 1);
+            }
+            let keyI = 0;
+            suite.add('sorted-btree (persistent)', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map = map.without(key);
+                map = map.with(key, 1);
+            });
+        }
+
+        {
+            let map = immutableSorted.SortedMap();
+            map.withMutations((map: any) => {
+                for (const key of initialKeys) {
+                    map = map.set(key, 1);
+                }
+            });
+            let keyI = 0;
+            suite.add('immutable-sorted (persistent)', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map = map.delete(key);
+                map = map.set(key, 1);
+            });
+        }
+
         suite.run();
     }
     console.log();
 
     console.log('-------------------------------------------------------------');
-    console.log('Map batch, for N random keys, remove then add it back');
+    console.log('Map persistent batch, for N random keys, remove then add it back');
     console.log();
 
-    for (const mapSize of [10, 100, 1000, 10000]) {
+    for (const mapSize of [10, 1000, 100000]) {
         for (const changes of [2, 10, 50]) {
             const suite = createSuite(test, changes, `Map size: ${mapSize}, N: ${changes}`);
 
@@ -120,29 +171,12 @@ async function mainAsync(progName: string, args: Array<string>) {
             }
 
             {
-                const map: {[key: string]: number} = {};
-                for (let key of initialKeys) {
-                    map[key] = 1;
-                }
-                let keyI = 0;
-                suite.add('JS Object', () => {
-                    for (let i = 0; i < changes; i++) {
-                        const key = initialKeys[keyI];
-                        keyI = keyI + 1;
-                        if (keyI === initialKeys.length) keyI = 0;
-                        delete map[key];
-                        map[key] = 1;
-                    }
-                });
-            }
-
-            {
                 const map = new Map();
-                for (let key of initialKeys) {
+                for (const key of initialKeys) {
                     map.set(key, 1);
                 }
                 let keyI = 0;
-                suite.add('JS Map', () => {
+                suite.add('built-in (in-place, for reference)', () => {
                     for (let i = 0; i < changes; i++) {
                         const key = initialKeys[keyI];
                         keyI = keyI + 1;
@@ -155,11 +189,34 @@ async function mainAsync(progName: string, args: Array<string>) {
 
             {
                 let map = immutableJs.Map();
-                for (let key of initialKeys) {
-                    map = map.set(key, 1);
-                }
+                map.withMutations((map: any) => {
+                    for (const key of initialKeys) {
+                        map = map.set(key, 1);
+                    }
+                });
                 let keyI = 0;
-                suite.add('ImmutableJS Map', () => {
+                suite.add('immutable', () => {
+                    map.withMutations(() => {
+                        for (let i = 0; i < changes; i++) {
+                            const key = initialKeys[keyI];
+                            keyI = keyI + 1;
+                            if (keyI === initialKeys.length) keyI = 0;
+                            map = map.delete(key);
+                            map = map.set(key, 1);
+                        }
+                    })
+                });
+            }
+
+            {
+                let map = immutableSorted.SortedMap();
+                map.withMutations((map: any) => {
+                    for (const key of initialKeys) {
+                        map = map.set(key, 1);
+                    }
+                });
+                let keyI = 0;
+                suite.add('immutable-sorted', () => {
                     map.withMutations(() => {
                         for (let i = 0; i < changes; i++) {
                             const key = initialKeys[keyI];
@@ -214,16 +271,19 @@ function printSystemInformation() {
     }
     console.log(`Node     ${process.versions.node}`);
     console.log(`V8       ${process.versions.v8}`);
-    console.log(`OpenSSL  ${process.versions.openssl}`);
     console.log(`OS       ${os.platform()}, ${os.release()}`);
     console.log(`NPM `);
-    for (const pkg of ['immutable', 'immer', 'crio', 'seamless-immutable', 'functional-red-black-tree']) {
+    for (const pkg of [
+        'immutable',
+        'functional-red-black-tree',
+        'sorted-btree',
+    ]) {
         const version = require(`${pkg}/package.json`).version;
         console.log(`    ${pkg} ${version}`);
     }
 }
 
-const NS_PAD = '            ';
+const NS_PAD = '        ';
 
 function leftPad(s: string) {
     if (s.length > NS_PAD.length) {
@@ -244,7 +304,7 @@ function createSuite(test: boolean, numOperations: number, name: string) {
             const target = (evt.target as any);
             const ns = Math.round(target.stats.mean * 1_000_000_000);
             const nsPerOperation = ns / numOperations;
-            console.log(`${leftPad(nsPerOperation.toFixed(2))}  ${target.name}`);
+            console.log(`${leftPad(String(Math.round(nsPerOperation)))}  ${target.name}`);
         },
         onError(evt: Benchmark.Event) {
             throw (evt.target as any).error;
