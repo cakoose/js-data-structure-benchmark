@@ -1,12 +1,12 @@
 'use strict';
 
-import * as assert from 'assert';
 import * as Benchmark from 'benchmark';
 import * as os from 'os';
 import * as argparse from 'argparse';
 import * as crypto from 'crypto';
 
 import * as immutableJs from 'immutable';
+const functionalRedBlackTree = require('functional-red-black-tree');
 
 async function mainAsync(progName: string, args: Array<string>) {
     const {filters, test} = parseArgs(progName, args);
@@ -28,8 +28,12 @@ async function mainAsync(progName: string, args: Array<string>) {
     printSystemInformation();
     console.log();
 
+    console.log('-------------------------------------------------------------');
+    console.log('Map, remove key then add it back');
+    console.log();
+
     for (const mapSize of [10, 100, 1000, 10000]) {
-        const suite = createSuite(test, `Map, remove key then add it back, size=${mapSize}`);
+        const suite = createSuite(test, 1, `Map size: ${mapSize}`);
 
         const initialKeys: Array<string> = [];
         for (let i = 0; i < mapSize; i++) {
@@ -39,8 +43,8 @@ async function mainAsync(progName: string, args: Array<string>) {
 
         {
             const map: {[key: string]: number} = {};
-            for (let i = 0; i < initialKeys.length; i++) {
-                map[initialKeys[i]] = 1;
+            for (let key of initialKeys) {
+                map[key] = 1;
             }
             let keyI = 0;
             suite.add('JS Object', () => {
@@ -54,8 +58,8 @@ async function mainAsync(progName: string, args: Array<string>) {
 
         {
             const map = new Map();
-            for (let i = 0; i < initialKeys.length; i++) {
-                map.set(initialKeys[i], 1);
+            for (let key of initialKeys) {
+                map.set(key, 1);
             }
             let keyI = 0;
             suite.add('JS Map', () => {
@@ -69,8 +73,8 @@ async function mainAsync(progName: string, args: Array<string>) {
 
         {
             let map = immutableJs.Map();
-            for (let i = 0; i < initialKeys.length; i++) {
-                map = map.set(initialKeys[i], 1);
+            for (let key of initialKeys) {
+                map = map.set(key, 1);
             }
             let keyI = 0;
             suite.add('ImmutableJS Map', () => {
@@ -82,11 +86,32 @@ async function mainAsync(progName: string, args: Array<string>) {
             });
         }
 
+        {
+            let map = functionalRedBlackTree();
+            for (let key of initialKeys) {
+                map = map.insert(key, 1);
+            }
+            let keyI = 0;
+            suite.add('functional-red-black-tree', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map = map.remove(key);
+                map = map.insert(key, 1);
+            });
+        }
+
         suite.run();
     }
-    for (const mapSize of [100, 1000, 10000]) {
-        for (const changes of [2, 5, 10, 20, 50]) {
-            const suite = createSuite(test, `Map, batch (remove key then add it back), size=${mapSize}, keys=${changes}`);
+    console.log();
+
+    console.log('-------------------------------------------------------------');
+    console.log('Map batch, for N random keys, remove then add it back');
+    console.log();
+
+    for (const mapSize of [10, 100, 1000, 10000]) {
+        for (const changes of [2, 10, 50]) {
+            const suite = createSuite(test, changes, `Map size: ${mapSize}, N: ${changes}`);
 
             const initialKeys: Array<string> = [];
             for (let i = 0; i < mapSize; i++) {
@@ -96,8 +121,8 @@ async function mainAsync(progName: string, args: Array<string>) {
 
             {
                 const map: {[key: string]: number} = {};
-                for (let i = 0; i < initialKeys.length; i++) {
-                    map[initialKeys[i]] = 1;
+                for (let key of initialKeys) {
+                    map[key] = 1;
                 }
                 let keyI = 0;
                 suite.add('JS Object', () => {
@@ -113,8 +138,8 @@ async function mainAsync(progName: string, args: Array<string>) {
 
             {
                 const map = new Map();
-                for (let i = 0; i < initialKeys.length; i++) {
-                    map.set(initialKeys[i], 1);
+                for (let key of initialKeys) {
+                    map.set(key, 1);
                 }
                 let keyI = 0;
                 suite.add('JS Map', () => {
@@ -130,8 +155,8 @@ async function mainAsync(progName: string, args: Array<string>) {
 
             {
                 let map = immutableJs.Map();
-                for (let i = 0; i < initialKeys.length; i++) {
-                    map = map.set(initialKeys[i], 1);
+                for (let key of initialKeys) {
+                    map = map.set(key, 1);
                 }
                 let keyI = 0;
                 suite.add('ImmutableJS Map', () => {
@@ -150,6 +175,7 @@ async function mainAsync(progName: string, args: Array<string>) {
             suite.run();
         }
     }
+    console.log();
 }
 
 // Has an interface similar to Benchmark.Suite, but just runs the code twice.
@@ -191,13 +217,13 @@ function printSystemInformation() {
     console.log(`OpenSSL  ${process.versions.openssl}`);
     console.log(`OS       ${os.platform()}, ${os.release()}`);
     console.log(`NPM `);
-    for (const pkg of ['immutable', 'immer', 'crio', 'seamless-immutable']) {
+    for (const pkg of ['immutable', 'immer', 'crio', 'seamless-immutable', 'functional-red-black-tree']) {
         const version = require(`${pkg}/package.json`).version;
         console.log(`    ${pkg} ${version}`);
     }
 }
 
-const NS_PAD = '        ';
+const NS_PAD = '            ';
 
 function leftPad(s: string) {
     if (s.length > NS_PAD.length) {
@@ -206,7 +232,7 @@ function leftPad(s: string) {
     return (NS_PAD + s).slice(-NS_PAD.length);
 }
 
-function createSuite(test: boolean, name: string) {
+function createSuite(test: boolean, numOperations: number, name: string) {
     if (test) {
         return new TestSuite(name);
     }
@@ -217,7 +243,8 @@ function createSuite(test: boolean, name: string) {
         onCycle(evt: Benchmark.Event) {
             const target = (evt.target as any);
             const ns = Math.round(target.stats.mean * 1_000_000_000);
-            console.log(`${leftPad(ns.toFixed(2))}  ${target.name}`);
+            const nsPerOperation = ns / numOperations;
+            console.log(`${leftPad(nsPerOperation.toFixed(2))}  ${target.name}`);
         },
         onError(evt: Benchmark.Event) {
             throw (evt.target as any).error;
