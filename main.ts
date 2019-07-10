@@ -9,6 +9,7 @@ import * as immutableJs from 'immutable';
 import SortedBTree from 'sorted-btree';
 const functionalRedBlackTree = require('functional-red-black-tree');
 const immutableSorted = require('immutable-sorted');
+const goneillBptree = require('./impls/goneill-b+tree');
 
 async function mainAsync(progName: string, args: Array<string>) {
     const {filters, test} = parseArgs(progName, args);
@@ -49,7 +50,7 @@ async function mainAsync(progName: string, args: Array<string>) {
                 map.set(key, 1);
             }
             let keyI = 0;
-            suite.add('built-in', () => {
+            suite.add('JS Map', () => {
                 const key = initialKeys[keyI];
                 keyI = keyI + 1;
                 if (keyI === initialKeys.length) keyI = 0;
@@ -136,6 +137,21 @@ async function mainAsync(progName: string, args: Array<string>) {
         }
 
         {
+            const map = immutableSorted.SortedMap().asMutable();
+            for (const key of initialKeys) {
+                map.set(key, 1);
+            }
+            let keyI = 0;
+            suite.add('immutable-sorted', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map.delete(key);
+                map.set(key, 1);
+            });
+        }
+
+        {
             let map = immutableSorted.SortedMap();
             map.withMutations((map: any) => {
                 for (const key of initialKeys) {
@@ -149,6 +165,21 @@ async function mainAsync(progName: string, args: Array<string>) {
                 if (keyI === initialKeys.length) keyI = 0;
                 map = map.delete(key);
                 map = map.set(key, 1);
+            });
+        }
+
+        for (const order of [8, 16]) {
+            const map = new goneillBptree(order);
+            for (const key of initialKeys) {
+                map.insert(key, 1);
+            }
+            let keyI = 0;
+            suite.add(`goneill-b+tree order=${order}`, () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map.remove(key);
+                map.insert(key, 1);
             });
         }
 
@@ -176,7 +207,7 @@ async function mainAsync(progName: string, args: Array<string>) {
                     map.set(key, 1);
                 }
                 let keyI = 0;
-                suite.add('built-in (in-place, for reference)', () => {
+                suite.add('JS Map (non-persistent for reference)', () => {
                     for (let i = 0; i < changes; i++) {
                         const key = initialKeys[keyI];
                         keyI = keyI + 1;

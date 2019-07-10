@@ -10,6 +10,8 @@
         "outDir": "./build"
     },
     "include": [
-        "main.ts"
+        "main.ts",
+        "impls/**/*.ts",
+        "impls/**/*.js"
     ]
 }
