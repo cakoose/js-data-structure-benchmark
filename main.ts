@@ -10,6 +10,7 @@ import SortedBTree from 'sorted-btree';
 const redisSortedSet = require('redis-sorted-set');
 const functionalRedBlackTree = require('functional-red-black-tree');
 const immutableSorted = require('immutable-sorted');
+const btreejs = require('btreejs');
 const goneillBptree = require('./impls/goneill-b+tree');
 
 async function mainAsync(progName: string, args: Array<string>) {
@@ -60,6 +61,36 @@ async function mainAsync(progName: string, args: Array<string>) {
             });
         }
 
+        for (const order of [16, 8]) {
+            const map = new goneillBptree(order);
+            for (const key of initialKeys) {
+                map.insert(key, 1);
+            }
+            let keyI = 0;
+            suite.add(`goneill-b+tree order=${order}`, () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map.remove(key);
+                map.insert(key, 1);
+            });
+        }
+
+        {
+            let map = functionalRedBlackTree();
+            for (const key of initialKeys) {
+                map = map.insert(key, 1);
+            }
+            let keyI = 0;
+            suite.add('functional-red-black-tree (persistent)', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map = map.remove(key);
+                map = map.insert(key, 1);
+            });
+        }
+
         {
             const map = immutableJs.Map().asMutable();
             for (const key of initialKeys) {
@@ -89,51 +120,6 @@ async function mainAsync(progName: string, args: Array<string>) {
                 if (keyI === initialKeys.length) keyI = 0;
                 map = map.delete(key);
                 map = map.set(key, 1);
-            });
-        }
-
-        {
-            let map = functionalRedBlackTree();
-            for (const key of initialKeys) {
-                map = map.insert(key, 1);
-            }
-            let keyI = 0;
-            suite.add('functional-red-black-tree (persistent)', () => {
-                const key = initialKeys[keyI];
-                keyI = keyI + 1;
-                if (keyI === initialKeys.length) keyI = 0;
-                map = map.remove(key);
-                map = map.insert(key, 1);
-            });
-        }
-
-        {
-            const map = new SortedBTree();
-            for (const key of initialKeys) {
-                map.set(key, 1);
-            }
-            let keyI = 0;
-            suite.add('sorted-btree', () => {
-                const key = initialKeys[keyI];
-                keyI = keyI + 1;
-                if (keyI === initialKeys.length) keyI = 0;
-                map.delete(key);
-                map.set(key, 1);
-            });
-        }
-
-        {
-            let map = new SortedBTree();
-            for (const key of initialKeys) {
-                map.set(key, 1);
-            }
-            let keyI = 0;
-            suite.add('sorted-btree (persistent)', () => {
-                const key = initialKeys[keyI];
-                keyI = keyI + 1;
-                if (keyI === initialKeys.length) keyI = 0;
-                map = map.without(key);
-                map = map.with(key, 1);
             });
         }
 
@@ -169,21 +155,6 @@ async function mainAsync(progName: string, args: Array<string>) {
             });
         }
 
-        for (const order of [8, 16]) {
-            const map = new goneillBptree(order);
-            for (const key of initialKeys) {
-                map.insert(key, 1);
-            }
-            let keyI = 0;
-            suite.add(`goneill-b+tree order=${order}`, () => {
-                const key = initialKeys[keyI];
-                keyI = keyI + 1;
-                if (keyI === initialKeys.length) keyI = 0;
-                map.remove(key);
-                map.insert(key, 1);
-            });
-        }
-
         {
             let map = new redisSortedSet();
             for (const key of initialKeys) {
@@ -197,6 +168,55 @@ async function mainAsync(progName: string, args: Array<string>) {
                 map.rem(key);
                 map.add(key, 1);
             });
+        }
+
+        {
+            const map = new SortedBTree();
+            for (const key of initialKeys) {
+                map.set(key, 1);
+            }
+            let keyI = 0;
+            suite.add('sorted-btree', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map.delete(key);
+                map.set(key, 1);
+            });
+        }
+
+        {
+            let map = new SortedBTree();
+            for (const key of initialKeys) {
+                map.set(key, 1);
+            }
+            let keyI = 0;
+            suite.add('sorted-btree (persistent)', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map = map.without(key);
+                map = map.with(key, 1);
+            });
+        }
+
+        // Crashes
+        if (false) {
+            for (const order of [8, 16]) {
+                const constructor = btreejs.create(order, btreejs.strcmp);
+                const map = new constructor();
+                for (const key of initialKeys) {
+                    map.put(key, 1);
+                }
+                let keyI = 0;
+                suite.add(`btreejs order=${order}`, () => {
+                    const key = initialKeys[keyI];
+                    keyI = keyI + 1;
+                    if (keyI === initialKeys.length) keyI = 0;
+                    map.del(key);
+                    map.put(key, 1);
+                });
+            }
         }
 
         suite.run();
@@ -326,6 +346,7 @@ function printSystemInformation() {
         'functional-red-black-tree',
         'sorted-btree',
         'redis-sorted-set',
+        'btreejs',
     ]) {
         const version = require(`${pkg}/package.json`).version;
         console.log(`    ${pkg} ${version}`);
