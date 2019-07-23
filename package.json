@@ -14,6 +14,7 @@
         "functional-red-black-tree": "1.0.1",
         "immutable": "4.0.0-rc.12",
         "immutable-sorted": "^0.2.11",
+        "redis-sorted-set": "^2.0.0",
         "semver": "5.6.0",
         "sorted-btree": "^1.2.1"
     },

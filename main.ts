@@ -7,6 +7,7 @@ import * as crypto from 'crypto';
 
 import * as immutableJs from 'immutable';
 import SortedBTree from 'sorted-btree';
+const redisSortedSet = require('redis-sorted-set');
 const functionalRedBlackTree = require('functional-red-black-tree');
 const immutableSorted = require('immutable-sorted');
 const goneillBptree = require('./impls/goneill-b+tree');
@@ -183,6 +184,21 @@ async function mainAsync(progName: string, args: Array<string>) {
             });
         }
 
+        {
+            let map = new redisSortedSet();
+            for (const key of initialKeys) {
+                map.add(key, 1);
+            }
+            let keyI = 0;
+            suite.add('redis-sorted-set', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map.rem(key);
+                map.add(key, 1);
+            });
+        }
+
         suite.run();
     }
     console.log();
@@ -306,8 +322,10 @@ function printSystemInformation() {
     console.log(`NPM `);
     for (const pkg of [
         'immutable',
+        'immutable-sorted',
         'functional-red-black-tree',
         'sorted-btree',
+        'redis-sorted-set',
     ]) {
         const version = require(`${pkg}/package.json`).version;
         console.log(`    ${pkg} ${version}`);
