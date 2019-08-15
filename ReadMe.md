@@ -1,4 +1,4 @@
-# JS Persistent Data Structure Benchmark
+# JS Data Structure Benchmark
 
 Work in progress.  Do not trust these results.
 
