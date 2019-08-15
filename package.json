@@ -9,6 +9,7 @@
     "author": "Kannan Goundan <kannan@cakoose.com>",
     "license": "CC0-1.0",
     "dependencies": {
+        "@thi.ng/associative": "^2.4.2",
         "argparse": "1.0.10",
         "benchmark": "2.1.4",
         "btreejs": "^0.3.0",

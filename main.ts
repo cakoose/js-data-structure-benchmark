@@ -5,6 +5,7 @@ import * as os from 'os';
 import * as argparse from 'argparse';
 import * as crypto from 'crypto';
 
+import * as assoc from "@thi.ng/associative";
 import * as immutableJs from 'immutable';
 import SortedBTree from 'sorted-btree';
 const redisSortedSet = require('redis-sorted-set');
@@ -200,6 +201,21 @@ async function mainAsync(progName: string, args: Array<string>) {
             });
         }
 
+        {
+            const map = new assoc.SortedMap();
+            for (const key of initialKeys) {
+                map.set(key, 1);
+            }
+            let keyI = 0;
+            suite.add('thi.ng/associative/SortedMap', () => {
+                const key = initialKeys[keyI];
+                keyI = keyI + 1;
+                if (keyI === initialKeys.length) keyI = 0;
+                map.delete(key);
+                map.set(key, 1);
+            });
+        }
+
         // Crashes
         if (false) {
             for (const order of [8, 16]) {
@@ -347,6 +363,7 @@ function printSystemInformation() {
         'sorted-btree',
         'redis-sorted-set',
         'btreejs',
+        '@thi.ng/associative',
     ]) {
         const version = require(`${pkg}/package.json`).version;
         console.log(`    ${pkg} ${version}`);
