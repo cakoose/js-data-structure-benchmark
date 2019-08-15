@@ -12,7 +12,6 @@
         "@thi.ng/associative": "^2.4.2",
         "argparse": "1.0.10",
         "benchmark": "2.1.4",
-        "btreejs": "^0.3.0",
         "functional-red-black-tree": "1.0.1",
         "immutable": "4.0.0-rc.12",
         "immutable-sorted": "^0.2.11",

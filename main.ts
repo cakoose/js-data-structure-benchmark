@@ -11,7 +11,6 @@ import SortedBTree from 'sorted-btree';
 const redisSortedSet = require('redis-sorted-set');
 const functionalRedBlackTree = require('functional-red-black-tree');
 const immutableSorted = require('immutable-sorted');
-const btreejs = require('btreejs');
 const goneillBptree = require('./impls/goneill-b+tree');
 
 async function mainAsync(progName: string, args: Array<string>) {
@@ -214,25 +213,6 @@ async function mainAsync(progName: string, args: Array<string>) {
                 map.delete(key);
                 map.set(key, 1);
             });
-        }
-
-        // Crashes
-        if (false) {
-            for (const order of [8, 16]) {
-                const constructor = btreejs.create(order, btreejs.strcmp);
-                const map = new constructor();
-                for (const key of initialKeys) {
-                    map.put(key, 1);
-                }
-                let keyI = 0;
-                suite.add(`btreejs order=${order}`, () => {
-                    const key = initialKeys[keyI];
-                    keyI = keyI + 1;
-                    if (keyI === initialKeys.length) keyI = 0;
-                    map.del(key);
-                    map.put(key, 1);
-                });
-            }
         }
 
         suite.run();
