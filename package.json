@@ -10,11 +10,12 @@
     "author": "Kannan Goundan <kannan@cakoose.com>",
     "license": "CC0-1.0",
     "dependencies": {
-        "@thi.ng/associative": "^5.0.8",
-        "@types/collections": "^5.0.2",
+        "@thi.ng/associative": "^5.0.13",
+        "@types/collections": "^5.1.0",
         "argparse": "2.0.1",
         "avl": "^1.4.4",
         "benchmark": "2.1.4",
+        "bplustree": "^2.0.1",
         "collections": "^5.1.12",
         "functional-red-black-tree": "1.0.1",
         "immutable": "4.0.0-rc.12",
@@ -23,10 +24,10 @@
         "sorted-btree": "^1.4.0"
     },
     "devDependencies": {
-        "@types/argparse": "2.0.2",
+        "@types/argparse": "2.0.5",
         "@types/benchmark": "2.1.0",
-        "@types/node": "14.14.6",
+        "@types/node": "14.14.20",
         "source-map-support": "^0.5.19",
-        "typescript": "4.0.5"
+        "typescript": "4.1.3"
     }
 }

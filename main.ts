@@ -220,64 +220,6 @@ async function mainAsync(progName: string, args: Array<string>) {
         suite.run(test);
     }
     console.log();
-
-    console.log('-------------------------------------------------------------');
-    console.log('Same as above, but batches of size N (for persistent structures)');
-    console.log();
-
-    for (const mapSize of [10, 1000, 100000]) {
-        for (const batchSize of [2, 10, 50]) {
-            const suite = new Suite(`Map size: ${mapSize}, N: ${batchSize}`, batchSize, passesFilter);
-
-            const keys: Array<string> = [];
-            const numKeys = mapSize * 3;
-            for (let i = 0; i < numKeys; i++) {
-                // TODO: Deterministic PRNG for repeatable results.
-                keys.push(crypto.randomBytes(9).toString('base64'));
-            }
-
-            {
-                const map = new Map();
-                for (let i = 0; i < mapSize; i++) {
-                    map.set(keys[i], 1);
-                }
-                let removeI = 0;
-                let addI = mapSize;
-                suite.add('JS Map (unsorted baseline)', () => {
-                    for (let i = 0; i < batchSize; i++) {
-                        map.delete(keys[removeI++]);
-                        map.set(keys[addI++], 1);
-                        if (addI === keys.length) addI = 0;
-                        if (removeI === keys.length) removeI = 0;
-                    }
-                });
-            }
-
-            {
-                let map = immutableSorted.SortedMap();
-                map.withMutations((map: any) => {
-                    for (let i = 0; i < mapSize; i++) {
-                        map = map.set(keys[i], 1);
-                    }
-                });
-                let removeI = 0;
-                let addI = mapSize;
-                suite.add('immutable-sorted [persistent]', () => {
-                    map.withMutations((map: any) => {
-                        for (let i = 0; i < batchSize; i++) {
-                            map.delete(keys[removeI++]);
-                            map.set(keys[addI++], 1);
-                            if (addI === keys.length) addI = 0;
-                            if (removeI === keys.length) removeI = 0;
-                        }
-                    });
-                });
-            }
-
-            suite.run(test);
-        }
-    }
-    console.log();
 }
 
 // Has an interface similar to Benchmark.Suite, but just runs the code twice.
@@ -346,11 +288,11 @@ function printSystemInformation() {
     console.log(`NPM `);
     for (const pkg of [
         'avl',
+        'collections',
         'functional-red-black-tree',
         'immutable',
         'immutable-sorted',
         'redis-sorted-set',
-        'collections',
         'sorted-btree',
         '@thi.ng/associative',
     ]) {

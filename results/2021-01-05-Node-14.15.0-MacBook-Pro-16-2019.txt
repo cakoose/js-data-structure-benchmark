@@ -1,0 +1,63 @@
+yarn run v1.22.10
+$ NODE_PATH=vendor node -r source-map-support/register dist/main.js
+CPU      12x Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
+Node     14.15.0
+V8       8.4.371.19-node.17
+OS       darwin, 19.6.0
+NPM 
+    avl 1.4.4
+    collections 5.1.12
+    functional-red-black-tree 1.0.1
+    immutable 4.0.0-rc.12
+    immutable-sorted 0.2.11
+    redis-sorted-set 2.0.0
+    sorted-btree 1.4.0
+    @thi.ng/associative 5.0.13
+
+Reported value is "ns per add+remove operation".
+Reported value is the mean of multiple test samples.
+
+-------------------------------------------------------------
+Remove a key then add a key.
+
+Map size: 10
+      48 ± 2%  JS Map (unsorted baseline)
+     145 ± 2%  avl
+     171 ± 0%  goneill-b+tree order=16
+     224 ± 1%  goneill-b+tree order=8
+     264 ± 0%  functional-red-black-tree [persistent]
+     864 ± 1%  sorted-btree, in-place
+    1080 ± 1%  sorted-btree [persistent]
+     551 ± 2%  thi.ng/associative SortedMap
+    1212 ± 2%  redis-sorted-set
+     883 ± 2%  immutable-sorted, in-place
+     803 ± 1%  immutable-sorted [persistent]
+    2288 ± 2%  collections.js SortedMap
+Map size: 1000
+      82 ± 2%  JS Map (unsorted baseline)
+     491 ± 1%  avl
+     869 ± 3%  goneill-b+tree order=16
+     907 ± 3%  goneill-b+tree order=8
+    1022 ± 2%  functional-red-black-tree [persistent]
+    2728 ± 1%  sorted-btree, in-place
+    3468 ± 1%  sorted-btree [persistent]
+    1610 ± 2%  thi.ng/associative SortedMap
+    1408 ± 2%  redis-sorted-set
+    2925 ± 1%  immutable-sorted, in-place
+    3305 ± 2%  immutable-sorted [persistent]
+    6514 ± 2%  collections.js SortedMap
+Map size: 100000
+     252 ± 9%  JS Map (unsorted baseline)
+    2331 ± 3%  avl
+    2646 ± 2%  goneill-b+tree order=16
+    3407 ± 1%  goneill-b+tree order=8
+    3693 ± 9%  functional-red-black-tree [persistent]
+    5010 ± 4%  sorted-btree, in-place
+    7658 ± 9%  sorted-btree [persistent]
+    8104 ± 3%  thi.ng/associative SortedMap
+    8603 ± 2%  redis-sorted-set
+    9590 ± 1%  immutable-sorted, in-place
+   10620 ± 9%  immutable-sorted [persistent]
+   16754 ± 2%  collections.js SortedMap
+
+Done in 202.14s.
