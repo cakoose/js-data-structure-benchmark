@@ -8,8 +8,8 @@ Run: `yarn run bench`
 
 ## Results
 
-2020-01-05:
-- MacBook Pro 16" 2019: [Node 14.15.0](results/2020-01-05-Node-14.15.0-MacBook-Pro-16-2019.txt)
+2021-01-05:
+- MacBook Pro 16" 2019: [Node 14.15.0](results/2021-01-05-Node-14.15.0-MacBook-Pro-16-2019.txt)
 
 2020-11-08:
 - MacBook Pro 13" 2016: [Node 14.15.0](results/2020-11-08-Node-14.15.0-MacBook-Pro-13-2016.txt)
