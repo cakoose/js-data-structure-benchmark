@@ -2,7 +2,7 @@
 
 Work in progress.  Do not trust these results.
 
-Setup: `yarn install --frozen-lockfile`
+Setup: `yarn install`
 
 Run: `yarn run bench`
 
